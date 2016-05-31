@@ -1,1 +1,0 @@
-{"appURL":"Please enter the name of the web server used to generate article previews","cfgURL":"Please enter the name of the configuration server","repo":"Please location of the article repository"}
