@@ -622,7 +622,7 @@
 		<row><td>ReadmeInformation</td><td>DlgLine</td><td>Line</td><td>48</td><td>234</td><td>326</td><td>0</td><td>3</td><td/><td/><td/><td/><td>0</td><td>0</td><td/><td/></row>
 		<row><td>ReadmeInformation</td><td>DlgTitle</td><td>Text</td><td>13</td><td>6</td><td>193</td><td>13</td><td>65539</td><td/><td>##IDS__IsReadmeDlg_ReadMeInfo##</td><td>DlgDesc</td><td/><td>0</td><td/><td/><td/></row>
 		<row><td>ReadmeInformation</td><td>Next</td><td>PushButton</td><td>230</td><td>243</td><td>66</td><td>17</td><td>1048579</td><td/><td>##IDS_NEXT##</td><td>Cancel</td><td/><td>0</td><td/><td/><td/></row>
-		<row><td>ReadmeInformation</td><td>Readme</td><td>ScrollableText</td><td>10</td><td>55</td><td>353</td><td>166</td><td>3</td><td/><td/><td>Banner</td><td/><td>0</td><td/><td>C:\Dev\KM\vba\Readme.rtf</td><td/></row>
+		<row><td>ReadmeInformation</td><td>Readme</td><td>ScrollableText</td><td>10</td><td>55</td><td>353</td><td>166</td><td>3</td><td/><td/><td>Banner</td><td/><td>0</td><td/><td>C:\Dev\wtools\Readme.rtf</td><td/></row>
 		<row><td>ReadyToInstall</td><td>Back</td><td>PushButton</td><td>164</td><td>243</td><td>66</td><td>17</td><td>3</td><td/><td>##IDS_BACK##</td><td>GroupBox1</td><td/><td>0</td><td/><td/><td/></row>
 		<row><td>ReadyToInstall</td><td>Banner</td><td>Bitmap</td><td>0</td><td>0</td><td>374</td><td>44</td><td>1</td><td/><td/><td/><td/><td>0</td><td/><td/><td>NewBinary1</td></row>
 		<row><td>ReadyToInstall</td><td>BannerLine</td><td>Line</td><td>0</td><td>44</td><td>374</td><td>0</td><td>1</td><td/><td/><td/><td/><td>0</td><td/><td/><td/></row>
@@ -1902,11 +1902,11 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
-		<row><td>kmj.dotm1</td><td>ISX_DEFAULTCOMPONENT4</td><td>KMJ~1.DOT|kmj.dotm</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Dev\KM\vba\kmj.dotm</td><td>1</td><td/></row>
-		<row><td>licence.rtf</td><td>ISX_DEFAULTCOMPONENT7</td><td>licence.rtf</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Dev\KM\vba\licence.rtf</td><td>1</td><td/></row>
-		<row><td>license.md</td><td>ISX_DEFAULTCOMPONENT7</td><td>LICENSE.md</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Dev\KM\vba\LICENSE.md</td><td>1</td><td/></row>
-		<row><td>readme.md</td><td>ISX_DEFAULTCOMPONENT7</td><td>README.md</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Dev\KM\vba\README.md</td><td>1</td><td/></row>
-		<row><td>readme.rtf</td><td>ISX_DEFAULTCOMPONENT7</td><td>Readme.rtf</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Dev\KM\vba\Readme.rtf</td><td>1</td><td/></row>
+		<row><td>kmj.dotm</td><td>ISX_DEFAULTCOMPONENT4</td><td>KMJ~1.DOT|kmj.dotm</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Dev\wtools\kmj.dotm</td><td>1</td><td/></row>
+		<row><td>licence.rtf</td><td>ISX_DEFAULTCOMPONENT7</td><td>licence.rtf</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Dev\wtools\licence.rtf</td><td>1</td><td/></row>
+		<row><td>license.md</td><td>ISX_DEFAULTCOMPONENT7</td><td>LICENSE.md</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Dev\wtools\LICENSE.md</td><td>1</td><td/></row>
+		<row><td>readme.md</td><td>ISX_DEFAULTCOMPONENT7</td><td>README.md</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Dev\wtools\README.md</td><td>1</td><td/></row>
+		<row><td>readme.rtf</td><td>ISX_DEFAULTCOMPONENT7</td><td>Readme.rtf</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Dev\wtools\Readme.rtf</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -4019,7 +4019,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>ISTheme</td><td>InstallShield Blue.theme</td></row>
 		<row><td>ISUSLock</td><td>{FA0CBA48-552C-4F0B-A08A-D8E4348E0B4C}</td></row>
 		<row><td>ISUSSignature</td><td>{DE4784B3-8B03-4095-8F04-56FBA5609600}</td></row>
-		<row><td>ISVisitedViews</td><td>viewAssistant,viewRelease,viewISToday,viewProject,viewAppFiles,viewRealSetupDesign,viewSetupDesign,viewUI,viewUpgradePaths,viewUpdateService,viewSupportFiles,viewCustomActions,viewFeatureFiles</td></row>
+		<row><td>ISVisitedViews</td><td>viewAssistant,viewRelease,viewISToday,viewProject,viewAppFiles,viewRealSetupDesign,viewSetupDesign,viewUI,viewUpgradePaths,viewUpdateService,viewSupportFiles,viewCustomActions,viewFeatureFiles,viewSetupTypes</td></row>
 		<row><td>Limited</td><td>1</td></row>
 		<row><td>LockPermissionMode</td><td>1</td></row>
 		<row><td>MsiExecCmdLineOptions</td><td/></row>
@@ -4395,9 +4395,9 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKAPPPOOLS</td><td>##IDS_PROGMSG_IIS_ROLLBACKAPPPOOLS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
-		<row><td>ProductCode</td><td>{4FF429DF-1D03-4EA4-9CF8-E6BE934A47A2}</td><td/></row>
+		<row><td>ProductCode</td><td>{5E1B4EAF-45B6-4350-9921-307986080F96}</td><td/></row>
 		<row><td>ProductName</td><td>Guidance Word Tools</td><td/></row>
-		<row><td>ProductVersion</td><td>0.05.0015</td><td/></row>
+		<row><td>ProductVersion</td><td>0.07.10</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
