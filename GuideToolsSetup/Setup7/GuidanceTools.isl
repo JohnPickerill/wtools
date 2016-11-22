@@ -4019,7 +4019,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>ISTheme</td><td>InstallShield Blue.theme</td></row>
 		<row><td>ISUSLock</td><td>{FA0CBA48-552C-4F0B-A08A-D8E4348E0B4C}</td></row>
 		<row><td>ISUSSignature</td><td>{DE4784B3-8B03-4095-8F04-56FBA5609600}</td></row>
-		<row><td>ISVisitedViews</td><td>viewAssistant,viewRelease,viewISToday,viewProject,viewAppFiles,viewRealSetupDesign,viewSetupDesign,viewUI,viewUpgradePaths,viewUpdateService,viewSupportFiles,viewCustomActions,viewFeatureFiles,viewSetupTypes</td></row>
+		<row><td>ISVisitedViews</td><td>viewAssistant,viewRelease,viewISToday,viewProject,viewAppFiles,viewRealSetupDesign,viewSetupDesign,viewUI,viewUpgradePaths,viewUpdateService,viewSupportFiles,viewCustomActions,viewFeatureFiles,viewSetupTypes,viewTextMessages</td></row>
 		<row><td>Limited</td><td>1</td></row>
 		<row><td>LockPermissionMode</td><td>1</td></row>
 		<row><td>MsiExecCmdLineOptions</td><td/></row>
@@ -4395,14 +4395,14 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKAPPPOOLS</td><td>##IDS_PROGMSG_IIS_ROLLBACKAPPPOOLS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
-		<row><td>ProductCode</td><td>{5E1B4EAF-45B6-4350-9921-307986080F96}</td><td/></row>
+		<row><td>ProductCode</td><td>{F8F0269D-894E-433E-8B8E-01319A694A83}</td><td/></row>
 		<row><td>ProductName</td><td>Guidance Word Tools</td><td/></row>
-		<row><td>ProductVersion</td><td>0.07.10</td><td/></row>
+		<row><td>ProductVersion</td><td>0.07.0026</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
 		<row><td>ProgressType3</td><td>installs</td><td/></row>
-		<row><td>READMEFILETOLAUNCHATEND</td><td>[INSTALLDIR]Curiouscrab\Guide\Readme.rtf</td><td/></row>
+		<row><td>READMEFILETOLAUNCHATEND</td><td>[INSTALLDIR]Curiouscrab\guidance\Readme.rtf</td><td/></row>
 		<row><td>RebootYesNo</td><td>Yes</td><td/></row>
 		<row><td>ReinstallFileVersion</td><td>o</td><td/></row>
 		<row><td>ReinstallModeText</td><td>omus</td><td/></row>
