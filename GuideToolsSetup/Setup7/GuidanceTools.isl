@@ -4395,9 +4395,9 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKAPPPOOLS</td><td>##IDS_PROGMSG_IIS_ROLLBACKAPPPOOLS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
-		<row><td>ProductCode</td><td>{F8F0269D-894E-433E-8B8E-01319A694A83}</td><td/></row>
+		<row><td>ProductCode</td><td>{9C0EE711-C8AC-4FDC-83DC-294FEC0ACFDD}</td><td/></row>
 		<row><td>ProductName</td><td>Guidance Word Tools</td><td/></row>
-		<row><td>ProductVersion</td><td>0.07.0026</td><td/></row>
+		<row><td>ProductVersion</td><td>0.08.00</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
