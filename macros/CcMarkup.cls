@@ -25,7 +25,8 @@ Private ReBullet As New RegExp
 Private ReAction As New RegExp
 Private ReSpace As New RegExp
 Private ReLeadSpace As New RegExp
-Private reMdLink As New RegExp
+Public reMdLink As New RegExp
+Public reMdxLink As New RegExp ' for use in cleanup
 Private reRelative As New RegExp
 
 Private log As StringBuilder
@@ -145,6 +146,15 @@ Private Sub Class_Initialize()
         .pattern = "(.*?)\[\[([^\| ]+?)((?:\]\])|(?:[\| ].*?\]\]))(.*)"
     End With
     
+    With reMdxLink
+        .Global = True
+        .MultiLine = True
+        .IgnoreCase = True
+        'look for markdown link syntax that indicates a link
+        .pattern = "\[.*\]\(.*\)"
+    End With
+    
+    
      With reRelative
         .Global = False
         .MultiLine = False
@@ -219,7 +229,7 @@ End Sub
 
 
 
-Function extractMu(linestr As String, Optional appset As Boolean = False) As String
+Function extractMu(doc As Document, linestr As String, Optional appset As Boolean = False) As String
     Dim m As Match
     Dim act As String
     Dim str As New StringBuilder
@@ -291,7 +301,7 @@ Function extractMu(linestr As String, Optional appset As Boolean = False) As Str
                 If com = "table" Then tableForm = para ' insert formating instruction for next table
                 If com = "apparition" Then ' apparate a ghost at this point
                     Dim apps As String
-                    apps = markup(get_apparition(para), True)
+                    apps = markup(doc, get_apparition(para), True)
                     ' TODO find a more elegant way - markup will append an CR because we are calling it recursively at this point I need to get rid of it
                     If Len(apps) > 5 Then
                             apps = Left(apps, Len(apps) - 5)
@@ -423,7 +433,7 @@ End Function
 
 
 
-Private Function makeTable(para As Paragraph) As String
+Private Function makeTable(doc As Document, para As Paragraph) As String
 'TODO need to change this so it does not step outside the range being converted
     Dim md As New StringBuilder
     Dim line2 As New StringBuilder
@@ -467,7 +477,7 @@ Private Function makeTable(para As Paragraph) As String
             md.Append c_col_delm
             Dim txt As String
             txt = extractHL(c.Range)
-            txt = extractMu(txt, False)
+            txt = extractMu(doc, txt, False)
             md.Append stripCell(txt)
         Next c
         Do While cnt < ccnt
@@ -559,7 +569,7 @@ End Sub
  
  
 
-Public Function markup(r As Range, Optional appset As Boolean = False) As String
+Public Function markup(doc As Document, r As Range, Optional appset As Boolean = False) As String
     Dim lineType As String
     Dim action As String
     Dim name As String
@@ -576,11 +586,11 @@ Public Function markup(r As Range, Optional appset As Boolean = False) As String
   
     ind = 0
     
-    FldCodes = ActiveWindow.View.ShowFieldCodes
-    ActiveWindow.View.ShowFieldCodes = False
-    hide = ActiveWindow.View.ShowHiddenText
+    FldCodes = doc.ActiveWindow.View.ShowFieldCodes
+    doc.ActiveWindow.View.ShowFieldCodes = False
+    hide = doc.ActiveWindow.View.ShowHiddenText
     If Not hide Then
-        ActiveWindow.View.ShowHiddenText = True
+        doc.ActiveWindow.View.ShowHiddenText = True
     End If
     
     headOffset = 99
@@ -591,7 +601,7 @@ Public Function markup(r As Range, Optional appset As Boolean = False) As String
 
         If para.Range.Information(wdWithInTable) Then
             If Not inTab Then
-                md.Append makeTable(para)
+                md.Append makeTable(doc, para)
                 inTab = True
             End If
             GoTo nextPara
@@ -654,7 +664,7 @@ Public Function markup(r As Range, Optional appset As Boolean = False) As String
         Dim rx As Range
         Set rx = para.Range.Duplicate
         txt = extractHL(rx)
-        txt = extractMu(txt, appset)
+        txt = extractMu(doc, txt, appset)
         If Not appset Then
             txt = escCre(txt)
         End If
@@ -674,9 +684,9 @@ nextPara:
     Next para
     markup = escHtml(md.text)
     
-    If ActiveWindow.View.ShowHiddenText <> hide Then
-        ActiveWindow.View.ShowHiddenText = hide
+    If doc.ActiveWindow.View.ShowHiddenText <> hide Then
+        doc.ActiveWindow.View.ShowHiddenText = hide
     End If
-    ActiveWindow.View.ShowFieldCodes = FldCodes
+    doc.ActiveWindow.View.ShowFieldCodes = FldCodes
 End Function
 

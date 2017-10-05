@@ -62,7 +62,7 @@ Private Sub Class_Initialize()
         .Global = True
         .MultiLine = True
         .IgnoreCase = True
-        .pattern = c_article_s & "([s,f]+),(.+)}}(.*)<(-+)"
+        .pattern = c_article_s & "([s,f]+),(.+?)}}(.*)<(-+)"
         
     End With
     With ReOld
@@ -284,8 +284,8 @@ Public Function createKmjObj() As Object
         End If
         
         
-        o("lastupdate") = Format(Now, "yyyy-mm-ddThh:mm:ss.000Z")
-        o("popularity") = "3"
+        'o("lastupdate") = Format(Now, "yyyy-mm-ddThh:mm:ss.000Z")
+        'o("popularity") = "3"
         
         'old schema
         cluster.Add setupForm.getCluster() ' first cluster should be the parent document
@@ -304,18 +304,18 @@ Public Function createKmjObj() As Object
         o("archive") = "false"
         
         Set m = CreateObject("Scripting.Dictionary")
-        m("change") = "reason for change unknown"
+        m("change") = ""
         m("significance") = "low"
         o.Add "master", m
         
-        o.Add "items", items
-        o.Add "keywords", keywords
-        o.Add "facets", facets
-        o.Add "kmlinks", intlinks
-        o.Add "extlinks", extLinks
+        'o.Add "items", items
+        'o.Add "keywords", keywords
+        'o.Add "facets", facets
+        'o.Add "kmlinks", intlinks
+        'o.Add "extlinks", extLinks
         
-        o("content") = ""
-        o("markup") = ""
+        'o("content") = ""
+        'o("markup") = ""
 
 
  
@@ -340,7 +340,7 @@ Public Function createSnippetObj() As Object
         o("owner") = ""
         o("expert") = ""
         
-        o("markup") = ""
+        'o("markup") = ""
         
         Set m = CreateObject("Scripting.Dictionary")
         o.Add "master", m
@@ -466,38 +466,7 @@ errlab:
 End Function
 
 
-Private Sub cleanit(r As Range)
-    For Each m In splitMarkup(r.text)
-        
-        leadout = Len(m.SubMatches(4))
-        leadin = Len(m.SubMatches(0))
-        act = m.SubMatches(1)
-        
-        Select Case act
-            Case "+"  ' Guide only
-                 r.text = m.SubMatches(3)
-            Case "-"  ' Trove Only
-                 r.text = ""
-            Case "&" ' commands e.g. Apparate, table
-                Dim com As String
-                Dim para As String
-                markup.extract_command m.SubMatches(3), com, para
-                'If com = "table" Then tableForm = para ' insert formating instruction for next table
-                If com = "apparition" Then ' apparate a ghost at this point
-                    Dim app As Range
-                    Set app = markup.get_apparition(para)
-                    app.Copy
-                    r.Paste
-                End If
-            Case "~" ' Ghost
-                ' should find ghost id check if its apparated anywhere and if it isn't delete it
-            Case ":" 'This is for block starts like dropdowns
-            Case "*" 'start of block e.g. ghost
-                    
-        End Select
-        
-    Next m
-End Sub
+ 
 
 
 
@@ -726,30 +695,29 @@ Public Function expandArticle(ByVal doc As Document, r As Range, kmj As Object) 
      Set para = st
      
     ' show hidden text so we can find article tags
-    asWas = ActiveWindow.View.ShowHiddenText
+    asWas = doc.ActiveWindow.View.ShowHiddenText
     If Not asWas Then
-        ActiveWindow.View.ShowHiddenText = True
+        doc.ActiveWindow.View.ShowHiddenText = True
     End If
      
      ' find start by looking before selection
      Do While Not (para Is Nothing)
         Set o = readMeta(para.Range.text, start_id, action)
         If Not o Is Nothing Then
-            If action = "f" Then
-                Set para = Nothing
-            Else
-                If action = "s" Then
-                        Set article_s = para
-                        If cnt = 1 Then  ' TODO neater way of testing if first para in range
-                            Set st = st.Next
-                            siz = siz - 1
-                        End If
-                        Set para = Nothing
-                        Set kmjObj = o
-                Else
-                    Set para = para.Previous
-                End If
-            End If
+            Select Case action
+                Case "f", "x"
+                    Set para = Nothing
+                Case "s"
+                    Set article_s = para
+                    If cnt = 1 Then  ' TODO neater way of testing if first para in range
+                        Set st = st.Next
+                        siz = siz - 1
+                    End If
+                    Set para = Nothing
+                    Set kmjObj = o
+                Case Else
+                    Set para = para.Previous ' TODO don't understand  why this isn't an error
+            End Select
         Else
             Set para = para.Previous
         End If
@@ -757,9 +725,7 @@ Public Function expandArticle(ByVal doc As Document, r As Range, kmj As Object) 
      Loop
      
 
-     
-     
-     
+      
  
       ' look forward through selection (except last line)
      cnt = 1
@@ -791,11 +757,11 @@ Public Function expandArticle(ByVal doc As Document, r As Range, kmj As Object) 
             Set para = para.Next
         Else
             Select Case action
-                Case "s"
+                Case "s", "x"
                     If log Is Nothing Then
-                        MsgBox "unexpected start metadata found"
+                        MsgBox "unexpected metadata marker  found"
                     Else
-                        log.Append "ERROR: unexpected start metadata found"
+                        log.Append "ERROR: unexpected metadata marker found"
                     End If
                     Set expandArticle = Nothing
                     GoTo endLabel
@@ -813,7 +779,7 @@ Public Function expandArticle(ByVal doc As Document, r As Range, kmj As Object) 
                         Set para = Nothing
                     End If
                 Case Else
-                    Set para = para.Next
+                    Set para = para.Next ' TODO don't undesratnad why this isn't an error
             End Select
         End If
         
@@ -835,8 +801,8 @@ Public Function expandArticle(ByVal doc As Document, r As Range, kmj As Object) 
      Set kmj = kmjObj
      Set expandArticle = doc.Range(start:=article_s.Range.start, End:=article_f.Range.End)
 endLabel:
-    If ActiveWindow.View.ShowHiddenText <> asWas Then
-        ActiveWindow.View.ShowHiddenText = asWas
+    If doc.ActiveWindow.View.ShowHiddenText <> asWas Then
+        doc.ActiveWindow.View.ShowHiddenText = asWas
     End If
 
    
@@ -846,42 +812,42 @@ Function readMeta(linestr As String, id As String, action As String) As Object
     Dim m As MatchCollection
     Dim tmeta As String
     Dim rm As Object
+    On Error GoTo errlab:
+    Set readMeta = Nothing
     If Not splitMeta(linestr, id, action, rm) Then
         Exit Function
     End If
-
-  
+    Set readMeta = rm
     ' change to new schema for clusters
-    
-    
-    
+    rm("id") = cctxt.cleanUID(rm("id"))
     If action = "s" Then
-
         'ensure km uids conform to convention
-        rm("id") = cctxt.cleanUID(rm("id"))
-        If rm.Exists("kmlinks") Then
-            For Each lnk In rm("kmlinks")
-                lnk("id") = cctxt.cleanUID(lnk("id"))
-            Next lnk
-        End If
+        
+        'If rm.Exists("kmlinks") Then
+        '    For Each lnk In rm("kmlinks")
+         '       lnk("id") = cctxt.cleanUID(lnk("id"))
+        '    Next lnk
+        'End If
                       
 
-        If Not rm.Exists("clusters") Then
-            Dim clusters As New Collection
-            rm.Add "clusters", clusters
-            For Each c In rm("cluster")
-                Set cs = CreateObject("Scripting.Dictionary")
-                cs("cluster") = c
-                cs("priority") = 9999 ' default priority
-                rm("clusters").Add cs 'add object to array
-            Next c
-        End If
+        'If Not rm.Exists("clusters") Then
+        '    Dim clusters As New Collection
+        '    rm.Add "clusters", clusters
+        '    For Each c In rm("cluster")
+        '        Set cs = CreateObject("Scripting.Dictionary")
+        '        cs("cluster") = c
+        '        cs("priority") = 9999 ' default priority
+        '        rm("clusters").Add cs 'add object to array
+        '    Next c
+        'End If
         
-        If Not rm.Exists("items") Then
-            Dim items As New Collection
-            rm.Add "items", items
-        End If
-        
+        'If Not rm.Exists("items") Then
+        '    Dim items As New Collection
+        '    rm.Add "items", items
+        'End If
+
+        If rm Is Nothing Then GoTo errlab:
+        On Error GoTo errlab
         If Not rm("master").Exists("significance") Then
             rm("master")("significance") = "low"
         End If
@@ -892,7 +858,7 @@ Function readMeta(linestr As String, id As String, action As String) As Object
             
         
         If Not rm("master").Exists("change") Then
-            rm("master")("change") = "reason for change unknown"
+            rm("master")("change") = ""
         End If
         
  
@@ -902,17 +868,15 @@ Function readMeta(linestr As String, id As String, action As String) As Object
             End If
         End If
     End If
-    
-
-    
-    If rm Is Nothing Then
-        If log Is Nothing Then
-            MsgBox "Error: Invalid meta data format"
-        Else
-            log.Append "Error: Invalid meta data format"
-        End If
+    Exit Function
+errlab:
+    action = "x"
+    If log Is Nothing Then
+        MsgBox "Error: Invalid meta data format"
+    Else
+        log.Append "Error: Invalid meta data format"
     End If
-    Set readMeta = rm
+
 End Function
 
 

@@ -21,6 +21,23 @@ Sub testrbac()
     canDo "publisher"
 End Sub
 
+ 
+
+Sub adfs()
+       Dim MyRequest As Object
+        Set MyRequest = CreateObject("WinHttp.WinHttpRequest.5.1")
+        url = Cfg.getVar("cfgURL") & "/guard"
+        MyRequest.Open "GET", url
+        MyRequest.setRequestHeader "X-Api-Key", "defaultapikey"
+        MyRequest.Option(4) = &H3300  ' ignore certicicate error
+        
+        ' Send Request.
+        MyRequest.send
+        'And we get this response
+        s = MyRequest.status
+        jsonstr = MyRequest.responseText
+End Sub
+
 Function canDo(action) As Boolean
     On Error GoTo errLabel
     canDo = False

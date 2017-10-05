@@ -42,7 +42,7 @@ Private Sub bOK_Click()
         kmj("master")("version") = ActiveDocument.Variables("VersionId")
         On Error GoTo 0
         
-        kmj("lastupdate") = Format(Now, "yyyy-mm-ddThh:mm:ss.000Z")
+        'kmj("lastupdate") = Format(Now, "yyyy-mm-ddThh:mm:ss.000Z")
  
         kmj("sensitivity") = ccbSensitivity.text
         thisCluster = tParent

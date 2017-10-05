@@ -35,7 +35,7 @@ Private Sub wdApp_WindowActivate(ByVal doc As Document, ByVal Wn As Window)
     On Error GoTo exitLab
     Dim repo As String
     repo = ""
-    If checkRepo(doc.path) Then
+    If checkLibrary(doc.path) Then
         Application.StatusBar = "Guidance document : state = " & getProp(doc, "guide")
     End If
 exitLab:

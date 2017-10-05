@@ -34,7 +34,7 @@ End Sub
 
 Public Sub openhandler(doc As Document)
     On Error GoTo errlab
-    If Not checkRepo(doc.path) Then GoTo ngLab
+    If Not checkLibrary(doc.path) Then GoTo ngLab
     If InStr(1, doc.name, "kmj.dotm") Then
         docUnlock doc
     Else
@@ -43,7 +43,7 @@ Public Sub openhandler(doc As Document)
     
     setKmDefaults doc
     doc.Saved = True ' to prevent spurious save on close
-    CustomizationContext = ActiveDocument.AttachedTemplate
+    CustomizationContext = doc.AttachedTemplate
     KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyS, wdKeyControl), KeyCategory:= _
         wdKeyCategoryCommand, Command:="uiSave"
     Application.StatusBar = "Practice guidance document : state = " & getProp(doc, "guide") _
@@ -52,6 +52,7 @@ Public Sub openhandler(doc As Document)
     Exit Sub
 ngLab:
     If isGuide(doc) Then
+        If checkExport(doc.path) Then Exit Sub
         doWrongLoc doc
         Application.StatusBar = "Guidance document : Invalid location"
     End If
@@ -106,17 +107,20 @@ Function doSave(ByVal doc As Document) As Boolean
     doSave = False
     
     If isGuide(doc) Then
-        If Not checkRepo(doc.path) Then
+        If checkLibrary(doc.path) Then
+            setProp doc, "hash", BASE64SHA1(doc.name & "_" & Format(Now, "yyyy-mm-ddThh:mm:ss"))
+        Else
             MsgBox "You can only save this document to the correct Practice Guidance Library"
             Exit Function ' Cancel Save
         End If
+        
         If getProp(doc, "guide") <> "_EDIT" Then
             MsgBox getProp(doc, "guide") & ": Guidance document cannot be saved"
             Exit Function ' Cancel Save
         End If
         
         guard doc
-        setSpProp ActiveDocument, "guide", "OK"
+        setSpProp doc, "guide", "OK"
         setSpProps doc
         doc.save
         doUnlock doc

@@ -59,6 +59,7 @@ Function getCheckpoint() As Object
     Set chkpt = fso.OpenTextFile(fn, ForReading)
     record = chkpt.ReadLine
     Set getCheckpoint = JsonDecode(record)
+    If getCheckpoint Is Nothing Then GoTo errorLabel
     chkpt.Close
     Exit Function
 errorLabel:

@@ -16,7 +16,7 @@ Attribute VB_Exposed = False
 Private ReSpace As New RegExp
 
 Public entityTypes As Object
-
+Private start As Long
 
 
 
@@ -77,6 +77,7 @@ Private Sub cbOk_Click()
     setCluster
     setType
     setPurpose
+    setProp ActiveDocument, "Cluster Start", CStr(start)
 exitLab:
     ActiveDocument.Saved = False
     setupForm.hide
@@ -127,8 +128,43 @@ Public Function getPurpose() As String
 End Function
 
 
+
+
+Private Sub tbStart_Change()
+    On Error GoTo resetLab:
+    Dim num As Long
+    If tbStart = "" Then Exit Sub
+    If Len(tbStart.text) > 5 Then
+        tbStart.text = Left(tbStart.text, 5)
+        Exit Sub
+    End If
+    start = CLng(tbStart.text)
+    Exit Sub
+resetLab:
+    tbStart.text = start
+End Sub
+
+Sub resetStart()
+    Dim s As String
+    s = getProp(ActiveDocument, "Cluster Start")
+    tbStart.text = testStart(s)
+End Sub
+
+Function testStart(s As String)
+    On Error GoTo errlab
+    testStart = CStr(CLng(s))
+    Exit Function
+errlab:
+    setProp ActiveDocument, "Cluster Start", 1
+    testStart = "1"
+End Function
+
+
+
+
 Private Sub UserForm_Activate()
     On Error GoTo errClusLab
+    resetStart
     ctCluster.text = ActiveDocument.CustomDocumentProperties("km_cluster")
     clWarning.Caption = ""
     GoTo classLab

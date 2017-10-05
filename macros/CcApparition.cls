@@ -59,7 +59,7 @@ Private Sub parseGhost(r As Range)
     hash = m(0).SubMatches(0)
 End Sub
 
-Public Sub clear(ByVal dc As Document)
+Public Sub clear(ByRef dc As Document)
     Set doc = dc
     hash = ""
     Set rngGhost = Nothing
@@ -69,7 +69,7 @@ End Sub
 Public Sub delete()
     rngGhost.text = ""
     rngGhost.Collapse (wdCollapseEnd)
-    Set rngHunt = rnghost.Duplicate
+    Set rngHunt = rngGhost.Duplicate
 End Sub
 
 

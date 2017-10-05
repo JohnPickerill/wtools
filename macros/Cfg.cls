@@ -10,7 +10,6 @@ Attribute VB_Exposed = False
 Private config As Object
 
 Private Sub Class_Initialize()
-    ' the following will happen when word starts
     cfgRead
     setErrcodes
 End Sub
@@ -38,6 +37,7 @@ Public Function serverRead(server) As Boolean
     config("library") = s_config("library")
     config("images") = s_config("static")
     config("checkpoint") = s_config("checkpoint")
+    config("export ") = s_config("checkpoint")
     serverRead = True
     Exit Function
 clearLab:

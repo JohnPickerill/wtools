@@ -187,6 +187,16 @@ Select Case Control.id
   
   End Select
 End Sub
+
+ 
+
+Sub setTags(vis As Boolean)
+     showMeta vis
+     bTags = Not vis
+     On Error Resume Next
+     KmRibbon.Invalidate
+End Sub
+
 'Callback for Toogle onAction
 Sub ToggleonAction(Control As IRibbonControl, pressed As Boolean)
 Select Case Control.id

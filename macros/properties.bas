@@ -7,10 +7,14 @@ Sub proptest()
 End Sub
 Public Sub setSpProps(doc As Document)
     On Error GoTo notGuide:
+
+    
+    setSpProp doc, "hash", getProp(doc, "hash")
     setSpProp doc, "guide", getProp(doc, "guide")
     setSpProp doc, "Cluster", setupForm.getCluster
     setSpProp doc, "Entity Type", setupForm.getType
     setSpProp doc, "Entity Purpose", setupForm.getPurpose
+    setSpProp doc, "Cluster Start", getProp(doc, "Cluster Start")
 notGuide:
 End Sub
 

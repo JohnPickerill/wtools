@@ -59,8 +59,9 @@ Private Function update() As Boolean
     Cfg.setVar "appURL", guide + "ui/" + preview
     Cfg.setVar "cfgURL", guide + "api"
     Cfg.setVar "guideMgr", guide + "api"
-    Cfg.setVar "trove", sharepoint + site + "/"
+    Cfg.setVar "docs", sharepoint + site + "/"
     Cfg.setVar "webDav", cctxt.webdav(sharepoint + site)
+ 
 
     update = True
 End Function
@@ -98,14 +99,17 @@ Private Sub setView()
     tbState.text = "sharepoint: " + Cfg.getVar("sharepoint") + vbCrLf
     tbState.text = tbState.text + "site:    " + Cfg.getVar("site") + vbCrLf
     tbState.text = tbState.text + "library: " + Cfg.getVar("library") + vbCrLf
+    tbState.text = tbState.text + "export: " + Cfg.getVar("export") + vbCrLf
     tbState.text = tbState.text + "checkpoint: " + Cfg.getVar("checkpoint") + vbCrLf + vbCrLf
     tbState.text = tbState.text + "config:  " + Cfg.getVar("cfgURL") + vbCrLf
     tbState.text = tbState.text + "manager: " + Cfg.getVar("guideMgr") + vbCrLf
     tbState.text = tbState.text + "assets:  " + Cfg.getVar("images") + vbCrLf
-    tbState.text = tbState.text + "docs:    " + Cfg.getVar("trove") + vbCrLf
+    tbState.text = tbState.text + "docs:    " + Cfg.getVar("docs") + vbCrLf
     tbState.text = tbState.text + "webdav:  " + Cfg.getVar("webDav") + vbCrLf
 End Sub
 
+
+ 
 
 Private Sub UserForm_Activate()
     ctGuide.text = Cfg.getVar("guide")

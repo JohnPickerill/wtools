@@ -3,8 +3,10 @@ Private Const wip_branch = "wip"
 Private Const adv_branch = "advance"
 Private Const live_branch = "live"
 Dim filecount As Integer
+Dim articlecount As Integer
 Dim record  As Object
-Const checkpoint_interval = 20
+Dim ad As Document
+Const checkpoint_interval = 5
 
 Dim errcodes As Object
 
@@ -15,7 +17,7 @@ Sub setErrcodes()
     errcodes.Add 201, "Created OK"
     errcodes.Add 441, "Invalid data sent to server"
     errcodes.Add 444, "File failed to open"
-    errcodes.Add 445, "Error selecting article"
+    errcodes.Add 445, "Range does not contain article"
     errcodes.Add 446, "Guidance flag in wrong state"
     errcodes.Add 447, "Invalid Metadata"
     errcodes.Add 448, "Invalid Object Type"
@@ -23,7 +25,7 @@ Sub setErrcodes()
 End Sub
 
 Function errString(code) As String
-    errString = code & " ==> " & errcodes(i)
+    errString = code & " ==> " & errcodes(code)
     
 End Function
 
@@ -32,18 +34,19 @@ End Function
 
 Sub writeErrorKey()
     For Each i In errcodes
-        resultsForm.Append errString(1) & vbCrLf
+        resultsForm.Append errString(i) & vbCrLf
     Next i
 
 End Sub
 
 Sub checkpoint()
     filecount = filecount + 1
-    If filecount > checkpoint_interval Then
+    If filecount >= checkpoint_interval Or articlecount >= 5 * checkpoint_interval Then
         resultsForm.Append vbCRLR & "===== Checkpoint =====" & vbCrLf
         putCheckpoint JsonEncode(record)
         'pushRecord wip_branch, record
         filecount = 0
+        articlecount = 0
     End If
 End Sub
 
@@ -213,7 +216,8 @@ Function summarise(record As Object, test As Boolean) As Object
                     If filobj("export_needed") Then
 
                         Set sFile = getNode(sFold, fil)
-                        sFile("status") = folders(fold)("files")(fil)("status")
+                        sFile("status") = errString(folders(fold)("files")(fil)("status"))
+                        file_status = folders(fold)("files")(fil)("status")
                         If folders(fold)("files")(fil)("status") >= 300 Then
                             num_errors = num_errors + 1
                         End If
@@ -226,7 +230,7 @@ Function summarise(record As Object, test As Boolean) As Object
                         Set sFile("objects") = CreateObject("Scripting.Dictionary")
                             
                         err_found = False
-                        If filobj.Exists("objects") Then
+                        If filobj.Exists("objects") And file_status <> 444 And files_status <> 446 Then
                             For Each obj In folders(fold)("files")(fil)("objects")
                                 If obj <> "status" Then
                                     Set thisobj = folders(fold)("files")(fil)("objects")(obj)
@@ -297,7 +301,8 @@ Sub saveAllDirectories(Optional test As Boolean = False)
         Exit Sub
      End If
      
-     this_name = ActiveDocument.name
+     Set ad = ActiveDocument
+     this_name = ad.name
      mgr_name = "Managing Practice Guidance"
      If (InStr(this_name, "kmj.dotm") = 0) And (InStr(this_name, mgr_name) = 0) Then
         MsgBox ("Please start export from document:" & vbCrLf & mgr_name)
@@ -342,7 +347,8 @@ Sub saveAllDirectories(Optional test As Boolean = False)
      record("status") = 0
      
      'path = "c:\dev\delivered"
-     path = Cfg.getVar("webDav") & "\" & Cfg.getVar("library") ' delivered"
+     'path = Cfg.getVar("webDav") & "\" & Cfg.getVar("library") ' delivered"
+     path = Cfg.getVar("webDav") & "\" & Cfg.getVar("export") ' delivered"
      'path = Cfg.getVar("webDav") & "\devLibrary"
      
      Dim folders As Object
@@ -365,7 +371,7 @@ Sub saveAllDirectories(Optional test As Boolean = False)
  
      
      If Not test Then
-        pushRecord wip_branch, record
+        'pushRecord wip_branch, record
         putCheckpoint JsonEncode(record)
      End If
      
@@ -399,7 +405,6 @@ Sub SaveAllFiles(path As String, fold As String, lastdate As Date, dirRecord As 
    
    Dim filename As String
 
-   Dim ad As Document
 
    Dim folder As String
    
@@ -422,7 +427,7 @@ Sub SaveAllFiles(path As String, fold As String, lastdate As Date, dirRecord As 
         '.Pattern = "exped.*"
     End With
     
-    Set ad = ActiveDocument
+
 
     For s = asc("0") To asc("Z")
         If (s <= asc("9") Or s >= asc("A")) Then
@@ -433,6 +438,7 @@ Sub SaveAllFiles(path As String, fold As String, lastdate As Date, dirRecord As 
             While (file <> "")
                  Set fileRecord = getNode(filesRecord, file) ' don't reset status because need to test ' note json gets into issues with \ in data
                  saveFile path, folder, file, fileRecord, test
+                 ad.Activate
                  ad.ActiveWindow.Visible = True
                  Application.ScreenUpdating = True
                  setStatus filesRecord, file
@@ -501,12 +507,12 @@ Sub saveFile(path As String, folder As String, file As String, _
             On Error GoTo fileErr
             Set dc = Application.Documents.Open(filename, AddToRecentFiles:=False, Visible:=True, ReadOnly:=True)
             On Error GoTo 0
-            ' ActiveDocument.TrackRevisions = False ' file is readonly so can't do this
-            With ActiveWindow.View.RevisionsFilter
+            ' dc.TrackRevisions = False ' file is readonly so can't do this
+            With dc.ActiveWindow.View.RevisionsFilter
                 .markup = wdRevisionsMarkupNone
                 .View = wdRevisionsViewFinal
             End With
-
+            
             dc.ActiveWindow.Visible = False
             Dim guide As String
             guide = getProp(dc, "guide")
@@ -584,7 +590,7 @@ Sub saveAllArticles(dc As Document, fileRecord As Object, lastmodified)
     dc.ActiveWindow.Activate
     
     ' comment
-    With ActiveWindow.View.RevisionsFilter
+    With dc.ActiveWindow.View.RevisionsFilter
         .markup = wdRevisionsMarkupNone
         .View = wdRevisionsViewFinal
     End With
@@ -592,16 +598,16 @@ Sub saveAllArticles(dc As Document, fileRecord As Object, lastmodified)
 
      
     ' need to show hidded text so that we can find article tags
-    asWas = ActiveWindow.View.ShowHiddenText
+    asWas = dc.ActiveWindow.View.ShowHiddenText
     If Not asWas Then
-        ActiveWindow.View.ShowHiddenText = True
+        dc.ActiveWindow.View.ShowHiddenText = True
     End If
     
     Set rng = dc.Range
     muEdit.markMarkup rng, True
     
     b = True
-    seq = 1
+    seq = CInt(getProp(dc, "Cluster Start"))
     
     Do While b
          With rng.Find
@@ -640,7 +646,7 @@ Sub saveAllArticles(dc As Document, fileRecord As Object, lastmodified)
                     Set errorRecord = getNode(objRecord, "errors", 0)
                     For Each obj In res("response")("result")
                             'If obj("status") >= 300 Then
-                                       errorRecord.Add "d", obj
+                                       errorRecord.Add obj("path"), obj
                             'End If
                     Next obj
                 End If
@@ -657,13 +663,14 @@ Sub saveAllArticles(dc As Document, fileRecord As Object, lastmodified)
 GoTo cleanupLab
 errorLab:
     MsgBox "unexpected error in " & dc.name & " press OK to continue"
-
+    Resume Next
+    
 cleanupLab:
    setStatus fileRecord, "objects"
    resultsForm.show
        
-   If ActiveWindow.View.ShowHiddenText <> asWas Then
-        ActiveWindow.View.ShowHiddenText = asWas
+   If dc.ActiveWindow.View.ShowHiddenText <> asWas Then
+        dc.ActiveWindow.View.ShowHiddenText = asWas
     End If
 End Sub
 
@@ -677,13 +684,14 @@ Private Function saveArticle(dc As Document, rng As Range, seq As Integer) As Ob
     Dim kmj As Object
     rng_start = rng.start
     Set rng = muEdit.expandArticle(dc, rng, kmj)
+    articlecount = articlecount + 1
      
     If rng Is Nothing Then
         Set res = CreateObject("Scripting.Dictionary")
         res("id") = "error_expanding_article at " & str(rng_start)
         res("type") = "unknown"
         res("status") = 445
-        res("statusText") = "Error: Selected range does not contain an article"
+        res("statusText") = errString(445)
         res("response") = "{}"
         Set saveArticle = res
         Exit Function
@@ -713,7 +721,7 @@ Private Function saveArticle(dc As Document, rng As Range, seq As Integer) As Ob
         Exit Function
     End If
     
-    kmj("markup") = markup.markup(rng)
+    kmj("markup") = markup.markup(dc, rng)
         Select Case kmj("type")
 
         Case Is = "article", "Article"
@@ -761,16 +769,17 @@ Private Function saveArticle(dc As Document, rng As Range, seq As Integer) As Ob
         kmj("master")("version") = dc.BuiltInDocumentProperties("Revision number")
         On Error GoTo 0
         
+        
         pri = seq
         For Each c In kmj("clusters")
            c("priority") = pri
-           pri = 1000000 + seq ' secondary clusters have a lower priority
+           pri = (1000000 + seq) * 100 ' secondary clusters have a lower priority
         Next c
 
         ' remove old schema remnants if there
-        If kmj.Exists("cluster") Then
-            kmj.Remove "cluster"
-        End If
+        'If kmj.Exists("cluster") Then
+        '    kmj.Remove "cluster"
+        'End If
         
         
         'update if not already set
@@ -778,9 +787,14 @@ Private Function saveArticle(dc As Document, rng As Range, seq As Integer) As Ob
             muEdit.setPeople kmj
         End If
         'save2Repo kmj
+        If kmj("master")("change") = "" Then
+            kmj("master")("change") = "no change reason given"
+        End If
         kmj("commit_comment") = kmj("master")("change")
+        kmj("master")("hash") = getProp(dc, "hash")
+ 
         kmj("master")("where") = dc.path
-        kmj("master")("filename") = ActiveDocument.name
+        kmj("master")("filename") = dc.name
         Set res = pushObject(wip_branch, kmj)
         'res("markup") = JsonEncode(kmj)
          res("type") = kmj("type")

@@ -3,14 +3,7 @@ Function isGuide(doc As Document) As Boolean
     isGuide = (Len(getProp(doc, "guide")) > 0)
 End Function
  
-Sub docUnlock(ByVal doc As Document)
-    ' this function is to allow administrator to unlock any document wherever
-    Dim repo As String
-    Dim dguide As String
-    Set doc = ActiveDocument
-    doc.Unprotect lockkey
-    setSpProp doc, "guide", "_EDIT"
-End Sub
+
  
 Function guard(doc As Document)
     On Error GoTo errlab
@@ -46,7 +39,15 @@ endLab:
 End Function
  
 
-
+Sub docUnlock(ByVal doc As Document)
+    ' this function is to allow administrator to unlock any document wherever
+    Dim repo As String
+    Dim dguide As String
+    Set doc = ActiveDocument
+    doc.Unprotect lockkey
+    setSpProp doc, "guide", "_EDIT"
+    doc.Saved = True ' to prevent spurious save on close
+End Sub
 
 Sub doUnlock(ByVal doc As Document)
     On Error Resume Next
@@ -58,6 +59,7 @@ Sub doUnlock(ByVal doc As Document)
     Else
         If unguard(doc) Then
             setSpProp doc, "guide", "_EDIT"
+            doc.Saved = True ' to prevent spurious save on close
         Else
             setSpProp doc, "guide", "_LOCK"
             guard doc

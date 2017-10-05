@@ -8,7 +8,7 @@ Public log As StringBuilder
 
 
 Sub uiCleanDoc()
-    cleanfile ActiveDocument
+    cleanFile ActiveDocument
 End Sub
  
 Sub uiUnlock()
@@ -96,7 +96,7 @@ End Sub
 Sub uImarkup()
     Dim markup As New CcMarkup
 
-    mdForm.tbMd = markup.markup(Selection.Range)
+    mdForm.tbMd = markup.markup(ActiveDocument, Selection.Range)
     mdForm.show
 
 End Sub
@@ -108,20 +108,27 @@ Sub exportImages()
 End Sub
 
 
+
+ 
+
+
+
 Sub previewJson()
     Dim markup As New CcMarkup
     Dim kmj As Object
+    ActiveWindow.View.ShowHiddenText = True
     
     If Not checkSelection(kmj) Or (kmj Is Nothing) Then
         MsgBox "selected range is not an article"
         Exit Sub
     End If
-    
-    kmj("markup") = markup.markup(Selection.Range)
-    For Each el In kmj("extlinks")
-        el("display") = el("name")
-        el("extlink") = el("url")
-    Next el
+ 
+    muEdit.markMarkup Selection.Range, True
+    kmj("markup") = markup.markup(ActiveDocument, Selection.Range)
+    'For Each el In kmj("extlinks")
+    '    el("display") = el("name")
+    '    el("extlink") = el("url")
+    'Next el
     
 
     If Not kmj Is Nothing Then
@@ -297,7 +304,7 @@ Sub uiNew()
     On Error GoTo errlabPath
     Set dlgOpen = Application.FileDialog( _
     FileDialogType:=msoFileDialogOpen)
-    dlgOpen.InitialFileName = Cfg.getVar("trove") & "virgin/"
+    dlgOpen.InitialFileName = Cfg.getVar("docs") & "virgin/"
     dlgOpen.AllowMultiSelect = False
     dlgOpen.Filters.Add "Guidance", "*.doc", 1
     dlgOpen.FilterIndex = 1
@@ -306,8 +313,8 @@ Sub uiNew()
     If dlgOpen.show = -1 Then
          On Error GoTo errlabCopy
          nam = getFileName(dlgOpen.SelectedItems(1))
-         sourceName = Cfg.getVar("trove") & "virgin/" & nam
-         targetName = Cfg.getVar("trove") & "wip/" & nam
+         sourceName = Cfg.getVar("docs") & "virgin/" & nam
+         targetName = Cfg.getVar("docs") & "wip/" & nam
          'TODO error handling and check if file already in WIP
          
         On Error Resume Next
@@ -343,7 +350,7 @@ Sub uiNew()
     Exit Sub
 errlabPath:
     
-    MsgBox "error : " & Err.Description & "<" & Cfg.getVar("trove") & "virgin/" & ">"
+    MsgBox "error : " & Err.Description & "<" & Cfg.getVar("docs") & "virgin/" & ">"
     Exit Sub
 errlabCopy:
     Application.ScreenUpdating = True
@@ -362,12 +369,12 @@ Sub uiOpen()
     Set dlgOpen = Application.FileDialog( _
     FileDialogType:=msoFileDialogOpen)
     dlgOpen.AllowMultiSelect = False
-    dlgOpen.InitialFileName = Cfg.getVar("trove") & "wip/" & "*.doc"
+    dlgOpen.InitialFileName = Cfg.getVar("docs") & "wip/" & "*.doc"
     dlgOpen.Filters.Add "Guidance", "*.doc", 1
     dlgOpen.FilterIndex = 1
     dlgOpen.ButtonName = "Edit"
     If dlgOpen.show = -1 Then
-        TheCurrentfilename = Cfg.getVar("trove") & "wip/" & getFileName(dlgOpen.SelectedItems(1))
+        TheCurrentfilename = Cfg.getVar("docs") & "wip/" & getFileName(dlgOpen.SelectedItems(1))
         On Error GoTo errlab
         If Documents.CanCheckOut(filename:=TheCurrentfilename) Then
             Documents.CheckOut filename:=TheCurrentfilename
@@ -400,12 +407,12 @@ Sub uiReview()
     Set dlgOpen = Application.FileDialog( _
     FileDialogType:=msoFileDialogOpen)
     dlgOpen.AllowMultiSelect = False
-    dlgOpen.InitialFileName = Cfg.getVar("trove") & "review/" & "*.doc"
+    dlgOpen.InitialFileName = Cfg.getVar("docs") & "review/" & "*.doc"
     dlgOpen.Filters.Add "Guidance", "*.doc", 1
     dlgOpen.FilterIndex = 1
     dlgOpen.ButtonName = "Review"
     If dlgOpen.show = -1 Then
-        TheCurrentfilename = Cfg.getVar("trove") & "review/" & getFileName(dlgOpen.SelectedItems(1))
+        TheCurrentfilename = Cfg.getVar("docs") & "review/" & getFileName(dlgOpen.SelectedItems(1))
         On Error GoTo errlab
         If Documents.CanCheckOut(filename:=TheCurrentfilename) Then
             Documents.CheckOut filename:=TheCurrentfilename
@@ -420,17 +427,26 @@ errlab:
     MsgBox Err.Description
 End Sub
  
- 
-
-Function checkRepo(pth As String) As Boolean
-    ' nod = getFileName(Cfg.getVar("trove"))' this is the 2010 prem version
+Function checkLibrary(pth As String)
     If InStr(1, pth, "wtools") Then
-        checkRepo = True
+        checkLibrary = True
         Exit Function
     End If
-    
-    repo = Cfg.getVar("library")
-    nod = Cfg.getVar("trove")
+    checkLibrary = checkRepo(Cfg.getVar("library"), pth)
+End Function
+
+Function checkExport(pth As String)
+    If InStr(1, pth, "wtools") Then
+        checkExport = True
+        Exit Function
+    End If
+    checkExport = checkRepo(Cfg.getVar("export"), pth)
+End Function
+
+Function checkRepo(repo As String, pth As String) As Boolean
+    ' nod = getFileName(Cfg.getVar("docs"))' this is the 2010 prem version
+
+    nod = Cfg.getVar("docs")
     Dim reRepo As New RegExp
     With reRepo
         .IgnoreCase = True
@@ -443,6 +459,7 @@ Function checkRepo(pth As String) As Boolean
     Set m = reRepo.Execute(pth)
     If m.count > 0 Then
         If repo <> "" Then
+            repo = replace(repo, " ", "%20")
             If LCase(repo) = LCase(m(0).SubMatches(0)) Then
                 checkRepo = True
             Else
@@ -460,7 +477,6 @@ End Function
 
 
 Sub uiSave()
-    MsgBox "uisave"
     doSave ActiveDocument
 End Sub
 
@@ -472,7 +488,7 @@ Sub uiCompare()
    Set ad = ActiveDocument
    nam = ad.name
    'nam = "johnp1.doc" ' ttt
-   wipDoc = Cfg.getVar("trove") & "wip/" & nam
+   wipDoc = Cfg.getVar("docs") & "wip/" & nam
    'Documents.Open wipDoc ' ttt
    'Set ad = ActiveDocument 'ttt
    On Error GoTo 0
@@ -481,14 +497,14 @@ Sub uiCompare()
         Exit Sub
    End If
    'ad.Close
-   Set virgin = Documents.Open(Cfg.getVar("trove") & "virgin/" & nam)
+   Set virgin = Documents.Open(Cfg.getVar("docs") & "virgin/" & nam)
    virgin.Compare name:=wipDoc, IgnoreAllComparisonWarnings:=True, DetectFormatChanges:=False
    virgin.Close
    ad.Windows(1).WindowState = wdWindowStateMinimize
 
    
-    'Set wip = Documents.Open((Cfg.getVar("trove") & "\wip\" & nam))
-   'name:=(Cfg.getVar("trove") & "\wip\" & nam), _
+    'Set wip = Documents.Open((Cfg.getVar("docs") & "\wip\" & nam))
+   'name:=(Cfg.getVar("docs") & "\wip\" & nam), _
    ' comparetarget:=wdCompareTargetSelected, _
    ' detectFormatchanges:=False
     
